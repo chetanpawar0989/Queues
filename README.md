@@ -1,79 +1,54 @@
-Cache, Proxies, Queues
+# HW3: Cache, Proxies, Queues
 =========================
-
 ### Setup
 
 * Clone this repo, run `npm install`.
 * Install redis and run on localhost:6379
 
-### A simple web server
-
-Use [express](http://expressjs.com/) to install a simple web server.
-
-	var server = app.listen(3000, function () {
-	
-	  var host = server.address().address
-	  var port = server.address().port
-	
-	  console.log('Example app listening at http://%s:%s', host, port)
-	})
-
-Express uses the concept of routes to use pattern matching against requests and sending them to specific functions.  You can simply write back a response body.
-
-	app.get('/', function(req, res) {
-	  res.send('hello world')
-	})
-
-### Redis
-
-You will be using [redis](http://redis.io/) to build some simple infrastructure components, using the [node-redis client](https://github.com/mranney/node_redis).
-
-	var redis = require('redis')
-	var client = redis.createClient(6379, '127.0.0.1', {})
-
-In general, you can run all the redis commands in the following manner: client.CMD(args). For example:
-
-	client.set("key", "value");
-	client.get("key", function(err,value){ console.log(value)});
-
-### An expiring cache
-
-Create two routes, `/get` and `/set`.
-
-When `/set` is visited, set a new key, with the value:
+### Task 1: Complete set/get with an expiring cache
+When `/set` is visited, application will set a new key in redis client with the value:
 > "this message will self-destruct in 10 seconds".
+Timer is set for this key in redis with `client.expire("key", 10);`
+When `/get` is visited, application will get that stored key and display it to webpage.
 
-Use the expire command to make sure this key will expire in 10 seconds.
+### Task 2: Recent visited sites
+New route with `/recent` has been created, which will display the most recently visited sites.
+Inside `app.use(function(req, res, next)` application is pushing current request's url into `urlList` variable. 
+Inside `/recent` route application is just fetching latest 5 values from `urlList` list with 
+	client.lrange(urlList, 0, 4, function(err,value){ ...
+and displaying on webpage.
 
-When `/get` is visited, fetch that key, and send value back to the client: `res.send(value)` 
-
-
-### Recent visited sites
-
-Create a new route, `/recent`, which will display the most recently visited sites.
-
-There is already a global hook setup, which will allow you to see each site that is requested:
-
-	app.use(function(req, res, next) 
-	{
-	...
-
-Use the lpush, ltrim, and lrange redis commands to store the most recent 5 sites visited, and return that to the client.
-
-### Cat picture uploads: queue
-
-Implement two routes, `/upload`, and `/meow`.
- 
-A stub for upload and meow has already been provided.
-
-Use curl to help you upload easily.
+### Task 3: Cat picture uploads: queue
+Two new routes `/upload`, and `/meow` are implemented.
+Image is uploaded using curl command as follows
 
 	curl -F "image=@./img/morning.jpg" localhost:3000/upload
 
-Have `upload` store the images in a queue.  Have `meow` display the most recent image to the client and *remove* the image from the queue.
+`upload` stores the images in a queue named `imageQueue` and when user sends a request to `\meow` route, recently uploaded image is displayed to user and is removed from redis queue `imageQueue`.
 
-### Proxy server
+### Task 4: Additional service instance running
+There is already an instance of service running at port 3000. Similar to that, I am running another instance of the service on port 3001 with following code.
 
-Bonus: How might you use redis and express to introduce a proxy server?
+	var additionalServer = app.listen(3001, function () {
 
-See [rpoplpush](http://redis.io/commands/rpoplpush)
+	  var host = additionalServer.address().address
+	  var port = additionalServer.address().port
+
+	  console.log('Additional instance of service is running at http://%s:%s', host, port)
+	})
+
+### Task 5: Proxy server
+I have added new node package `http-proxy` for creating proxy server. Following code runs proxy server on port 3002.
+	var proxy   = httpProxy.createProxyServer({});
+	var serverProxy  = http.createServer(function(req, res)
+	{
+	  client.rpoplpush(serverList, serverList, function(err, TARGET){
+	  		console.log("TARGET:" + TARGET);
+		  	proxy.web( req, res, {target: TARGET } );
+	  });
+	  
+	});
+	serverProxy.listen(3002);
+	console.log('Proxy listening at http://%s:%s', serverProxy.address().address, serverProxy.address().port);
+[rpoplpush](http://redis.io/commands/rpoplpush)
+
