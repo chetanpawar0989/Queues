@@ -1,5 +1,5 @@
 # HW3: Cache, Proxies, Queues
-=========================
+
 ### Setup
 
 * Clone this repo, run `npm install`.
@@ -39,6 +39,9 @@ There is already an instance of service running at port 3000. Similar to that, I
 
 ### Task 5: Proxy server
 I have added new node package `http-proxy` for creating proxy server. Following code runs proxy server on port 3002.
+	client.rpush(serverList, 'http://127.0.0.1:3000');
+	client.rpush(serverList, 'http://127.0.0.1:3001');
+	
 	var proxy   = httpProxy.createProxyServer({});
 	var serverProxy  = http.createServer(function(req, res)
 	{
@@ -50,5 +53,6 @@ I have added new node package `http-proxy` for creating proxy server. Following 
 	});
 	serverProxy.listen(3002);
 	console.log('Proxy listening at http://%s:%s', serverProxy.address().address, serverProxy.address().port);
-[rpoplpush](http://redis.io/commands/rpoplpush)
+Here I am using [rpoplpush](http://redis.io/commands/rpoplpush) command to switch between the two URLs that are added to serverList object in redis.
 
+##### Video demo link: [Demo](http://youtube.com)
