@@ -17,7 +17,7 @@ client.rpush(serverList, 'http://127.0.0.1:3000');
 client.rpush(serverList, 'http://127.0.0.1:3001');
 
 //HTTP Proxy
-/*var proxy   = httpProxy.createProxyServer({});
+var proxy   = httpProxy.createProxyServer({});
 var serverProxy  = http.createServer(function(req, res)
 {
 	client.rpoplpush(serverList, serverList, function(err, TARGET){
@@ -26,7 +26,7 @@ var serverProxy  = http.createServer(function(req, res)
   	});
 });
 serverProxy.listen(3002);
-console.log('Proxy listening at http://%s:%s', serverProxy.address().address, serverProxy.address().port);*/
+console.log('Proxy listening at http://%s:%s', serverProxy.address().address, serverProxy.address().port);
 
 //HTTP SERVER 1
 var server = app.listen(3000, function () {
@@ -36,11 +36,11 @@ var server = app.listen(3000, function () {
 })
 
 //HTTP SERVER 2
-/*var additionalServer = app.listen(3001, function () {
+var additionalServer = app.listen(3001, function () {
   var host = additionalServer.address().address
   var port = additionalServer.address().port
   console.log('Additional instance of service is running at http://%s:%s', host, port)
-})*/
+})
 
 // Add hook to make it easier to get all visited URLS.
 app.use(function(req, res, next) 

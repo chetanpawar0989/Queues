@@ -55,4 +55,4 @@ I have added new node package `http-proxy` for creating proxy server. Following 
 	console.log('Proxy listening at http://%s:%s', serverProxy.address().address, serverProxy.address().port);
 Here I am using [rpoplpush](http://redis.io/commands/rpoplpush) command to switch between the two URLs that are added to serverList object in redis.
 
-##### Video demo link: [Demo](http://youtube.com)
+##### Video demo link: [Demo](https://youtu.be/w1k-B1NZrek)
